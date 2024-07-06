@@ -1,0 +1,72 @@
+pipeline {
+
+    agent any
+
+    environment {
+        IMAGE_TAG = "v.0.${env.BUILD_NUMBER}"
+        DOCKERHUB_CREDENTIALS = credentials('5f8b634a-148a-4067-b996-07b4b3276fba')
+        DOCKERHUB_USERNAME = 'idrisniyi94'
+        DEPLOYMENT_NAME = 'expreezmeal'
+        DEV_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${DEPLOYMENT_NAME}-dev:${IMAGE_TAG}"
+        PROD_IMAGE_NAME = "${DOCKERHUB_USERNAME}/${DEPLOYMENT_NAME}-prod:${IMAGE_TAG}"
+        BRANCH_NAME = "${GIT_BRANCH.split('/')[1]}"
+    }
+
+    stages {
+        stage("Clean Workspace") {
+            steps {
+                cleanWs()
+            }
+        }
+        stage("Checkout") {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/dev'], [name: '*/prod']], userRemoteConfigs: [[url: 'https://github.com/stwins60/expreezmeal.git']]])
+            }
+        }
+        stage("Pytest") {
+            steps {
+                script {
+                    // sh "python3 -m venv .venv"
+                    // sh "source .venv/bin/activate"
+                    sh "python3 -m pip install -r requirements.txt --no-cache-dir --break-system-packages"
+                    sh "python3 -m pytest app-test.py"
+                }
+            }
+        }
+        stage("Build Docker Image") {
+            steps {
+                script {
+                    if (BRANCH_NAME == 'dev') {
+                        echo "Building Dev Image"
+                        sh "docker build -t $DEV_IMAGE_NAME -f Dockerfile.dev ."
+                    }
+                    else if (BRANCH_NAME == 'prod') {
+                        echo "Building Prod Image"
+                        sh "docker build -t $PROD_IMAGE_NAME -f Dockerfile.prod ."
+                    }
+                }
+            }
+        }
+        stage("Login to DockerHub") {
+            steps {
+                script {
+                    sh "echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin"
+                }
+            }
+        }
+        stage("Push to DockerHub") {
+            steps {
+                script {
+                    if (BRANCH_NAME == 'dev') {
+                        echo "Pushing Dev Image"
+                        sh "docker push $DEV_IMAGE_NAME"
+                    }
+                    else if (BRANCH_NAME == 'prod') {
+                        echo "Building Prod Image"
+                        sh "docker push $PROD_IMAGE_NAME"
+                    }
+                }
+            }
+        }
+    }
+}
