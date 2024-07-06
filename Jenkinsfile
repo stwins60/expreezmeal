@@ -26,9 +26,9 @@ pipeline {
         stage("Pytest") {
             steps {
                 script {
-                    sh "python3 -m venv .venv"
-                    sh "source .venv/bin/activate"
-                    sh "python3 -m pip install -r requirements.txt --no-cache-dir"
+                    // sh "python3 -m venv .venv"
+                    // sh "source .venv/bin/activate"
+                    sh "python3 -m pip install -r requirements.txt --no-cache-dir --break-system-packages"
                     sh "python3 -m pytest app-test.py"
                 }
             }
