@@ -26,8 +26,10 @@ pipeline {
         stage("Pytest") {
             steps {
                 script {
-                    sh "pip install -r requirements.txt --no-cache-dir"
-                    sh "python -m pytest app-test.py"
+                    sh "python3 -m venv .venv"
+                    sh "source .venv/bin/activate"
+                    sh "python3 -m pip install -r requirements.txt --no-cache-dir"
+                    sh "python3 -m pytest app-test.py"
                 }
             }
         }
@@ -35,9 +37,11 @@ pipeline {
             steps {
                 script {
                     if (BRANCH_NAME == 'dev') {
+                        echo "Building Dev Image"
                         sh "docker build -t $DEV_IMAGE_NAME -f Dockerfile.dev ."
                     }
                     else if (BRANCH_NAME == 'prod') {
+                        echo "Building Prod Image"
                         sh "docker build -t $PROD_IMAGE_NAME -f Dockerfile.prod ."
                     }
                 }
