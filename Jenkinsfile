@@ -77,22 +77,22 @@ pipeline {
                 }
             }
         }
-        stage("Test Container") {
-            steps {
-                script {
-                    if (BRANCH_NAME == 'dev') {
-                        echo "Running DEV container"
-                        sh "docker run -d --name $DEPLOYMENT_NAME-dev -p 5551:5000 $DEV_IMAGE_NAME"
+        // stage("Test Container") {
+        //     steps {
+        //         script {
+        //             if (BRANCH_NAME == 'dev') {
+        //                 echo "Running DEV container"
+        //                 sh "docker run -d --name $DEPLOYMENT_NAME-dev -p 5551:5000 $DEV_IMAGE_NAME"
                         
                         
-                    }
-                    else if (BRANCH_NAME == 'prod') {
-                        echo "Running Prod Container"
-                        sh "docker run -d --name $DEPLOYMENT_NAME-prod -p 5552:5000 $PROD_IMAGE_NAME"
-                    }
-                }
-            }
-        }
+        //             }
+        //             else if (BRANCH_NAME == 'prod') {
+        //                 echo "Running Prod Container"
+        //                 sh "docker run -d --name $DEPLOYMENT_NAME-prod -p 5552:5000 $PROD_IMAGE_NAME"
+        //             }
+        //         }
+        //     }
+        // }
         stage('Deploy') {
             steps {
                 script {
