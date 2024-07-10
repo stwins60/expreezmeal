@@ -16,7 +16,7 @@ pipeline {
     parameters {
         choice(
             name: "DEPLOYMENT_OPTION",
-            choices:['stop', 'delete'],
+            choices:['run', 'stop', 'delete'],
             description: "What deployment operation do you want to perform ?"
         )
     }
@@ -93,7 +93,7 @@ pipeline {
                 }
             }
         }
-        stage('Clean UP') {
+        stage('Deploy') {
             steps {
                 script {
                    if (BRANCH_NAME == 'dev') {
@@ -103,6 +103,9 @@ pipeline {
                         else if (params.DEPLOYMENT_OPTION == 'delete') {
                             sh "docker rm $DEPLOYMENT_NAME-dev"
                         }
+                        else if (params.DEPLOYMENT_OPTION == 'run') {
+                            sh "docker run -d --name $DEPLOYMENT_NAME-dev -p 5551:5000 $DEV_IMAGE_NAME"
+                        }
                     }
                     else if (BRANCH_NAME == 'prod') {
                         if (params.DEPLOYMENT_OPTION == 'stop') {
@@ -110,6 +113,9 @@ pipeline {
                         }
                         else if (params.DEPLOYMENT_OPTION == 'delete') {
                             sh "docker rm $DEPLOYMENT_NAME-prod"
+                        }
+                        else if (params.DEPLOYMENT_OPTION == 'run') {
+                            sh "docker run -d --name $DEPLOYMENT_NAME-prod -p 5552:5000 $PROD_IMAGE_NAME"
                         }
                     } 
                 }
