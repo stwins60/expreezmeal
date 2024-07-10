@@ -13,6 +13,14 @@ pipeline {
 
     }
 
+    parameters {
+        choice(
+            name: "DEPLOYMENT_OPTION",
+            choices:['stop', 'delete'],
+            description: "What deployment operation do you want to perform ?"
+        )
+    }
+
     stages {
         stage("Clean Workspace") {
             steps {
@@ -75,11 +83,35 @@ pipeline {
                     if (BRANCH_NAME == 'dev') {
                         echo "Running DEV container"
                         sh "docker run -d --name $DEPLOYMENT_NAME-dev -p 5551:5000 $DEV_IMAGE_NAME"
+                        
+                        
                     }
                     else if (BRANCH_NAME == 'prod') {
                         echo "Running Prod Container"
                         sh "docker run -d --name $DEPLOYMENT_NAME-prod -p 5552:5000 $PROD_IMAGE_NAME"
                     }
+                }
+            }
+        }
+        stage('Clean UP') {
+            steps {
+                script {
+                   if (BRANCH_NAME == 'dev') {
+                        if (params.DEPLOYMENT_OPTION == 'stop') {
+                            sh "docker stop $DEPLOYMENT_NAME-dev"
+                        }
+                        else if (params.DEPLOYMENT_OPTION == 'delete') {
+                            sh "docker rm $DEPLOYMENT_NAME-dev"
+                        }
+                    }
+                    else if (BRANCH_NAME == 'prod') {
+                        if (params.DEPLOYMENT_OPTION == 'stop') {
+                            sh "docker stop $DEPLOYMENT_NAME-prod"
+                        }
+                        else if (params.DEPLOYMENT_OPTION == 'delete') {
+                            sh "docker rm $DEPLOYMENT_NAME-prod"
+                        }
+                    } 
                 }
             }
         }
