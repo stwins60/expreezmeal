@@ -22,7 +22,7 @@ spec:
               - key: kubernetes.io/hostname
                 operator: In
                 values:
-                - proxmox-ser
+                - k8s-ser
         # podAffinity:
         #   requiredDuringSchedulingIgnoredDuringExecution:
         #   - labelSelector:
