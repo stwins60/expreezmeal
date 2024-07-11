@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: expressmeal-deployment
+  namespace: dev-namespace
+spec:
+  selector:
+    matchLabels:
+      app: expressmeal-deployment
+  template:
+    metadata:
+      labels:
+        app: expressmeal-deployment
+    spec:
+      containers:
+      - name: expressmeal-deployment
+        image: IMAGE_NAME
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 5000

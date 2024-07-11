@@ -91,6 +91,13 @@ pipeline {
                             sh "docker rm $DEPLOYMENT_NAME-dev"
                         } else if (params.DEPLOYMENT_OPTION == 'run') {
                             sh "docker run -d --name $DEPLOYMENT_NAME-dev -p 5551:5000 $DEV_IMAGE_NAME"
+                            dir('./k8s') {
+                                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', namespace: '', serverUrl: '']]) {
+                                    sh "sed -i 's|IMAGE_NAME|$env.DEV_IMAGE_NAME|g' deployment.yaml"
+                                    sh "kubectl apply -f deployment.yaml"
+                                    sh "kubectl apply service.yaml"
+                                }
+                            }
                         }
                     } else if (BRANCH_NAME == 'prod') {
                         if (params.DEPLOYMENT_OPTION == 'stop') {
@@ -99,6 +106,13 @@ pipeline {
                             sh "docker rm $DEPLOYMENT_NAME-prod"
                         } else if (params.DEPLOYMENT_OPTION == 'run') {
                             sh "docker run -d --name $DEPLOYMENT_NAME-prod -p 5552:5000 $PROD_IMAGE_NAME"
+                            dir('./k8s') {
+                                withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', namespace: '', serverUrl: '']]) {
+                                    sh "sed -i 's|IMAGE_NAME|$env.PROD_IMAGE_NAME|g' deployment.yaml"
+                                    sh "kubectl apply -f deployment.yaml"
+                                    sh "kubectl apply service.yaml"
+                                }
+                            }
                         }
                     }
                 }
