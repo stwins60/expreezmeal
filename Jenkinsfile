@@ -95,7 +95,7 @@ pipeline {
                                 withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', namespace: '', serverUrl: '']]) {
                                     sh "sed -i 's|IMAGE_NAME|$env.DEV_IMAGE_NAME|g' deployment.yaml"
                                     sh "kubectl apply -f deployment.yaml"
-                                    sh "kubectl apply service.yaml"
+                                    sh "kubectl apply -f service.yaml"
                                 }
                             }
                         }
@@ -110,7 +110,7 @@ pipeline {
                                 withKubeCredentials(kubectlCredentials: [[caCertificate: '', clusterName: '', contextName: '', credentialsId: '3f12ff7b-93cb-4ea5-bc21-79bcf5fb1925', namespace: '', serverUrl: '']]) {
                                     sh "sed -i 's|IMAGE_NAME|$env.PROD_IMAGE_NAME|g' deployment.yaml"
                                     sh "kubectl apply -f deployment.yaml"
-                                    sh "kubectl apply service.yaml"
+                                    sh "kubectl apply -f service.yaml"
                                 }
                             }
                         }
