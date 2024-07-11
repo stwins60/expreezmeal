@@ -4,14 +4,34 @@ metadata:
   name: expressmeal-deployment
   namespace: dev-namespace
 spec:
+  replicas: 3 
   selector:
     matchLabels:
       app: expressmeal-deployment
+      env: dev
   template:
     metadata:
       labels:
         app: expressmeal-deployment
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                - k8s-ser
+        # podAffinity:
+        #   requiredDuringSchedulingIgnoredDuringExecution:
+        #   - labelSelector:
+        #       matchExpressions:
+        #       - key: env
+        #         operator: In
+        #         values:
+        #         - dev
+            # topologyKey: kubernetes.io/hostname
       containers:
       - name: expressmeal-deployment
         image: IMAGE_NAME
