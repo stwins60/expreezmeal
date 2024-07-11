@@ -8,7 +8,6 @@ spec:
   selector:
     matchLabels:
       app: expressmeal-deployment
-      env: dev
   template:
     metadata:
       labels:
